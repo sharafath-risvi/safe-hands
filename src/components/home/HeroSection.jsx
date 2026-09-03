@@ -69,6 +69,8 @@ const HeroSection = () => {
     const ctx = canvas.getContext('2d');
     let proxy = { frame: 0 };
     
+    let currentDrawnIdx = -1;
+    
     // Draw image with object-fit: contain logic (preserves full original composition)
     function drawImageContain(ctx, img, x, y, w, h) {
       if (arguments.length === 2) {
@@ -102,10 +104,10 @@ const HeroSection = () => {
     }
 
     const renderFrame = (index) => {
-      const idx = Math.max(0, Math.min(frameCount - 1, Math.round(index)));
+      const targetIdx = Math.max(0, Math.min(frameCount - 1, Math.round(index)));
       
       // Lookahead preload (preload next 15 frames from current position)
-      for (let i = idx; i < Math.min(frameCount, idx + 15); i++) {
+      for (let i = targetIdx; i < Math.min(frameCount, targetIdx + 15); i++) {
          if (!imagesRef.current[i]) {
             const preImg = new Image();
             preImg.src = frameUrls[i];
@@ -113,18 +115,47 @@ const HeroSection = () => {
          }
       }
 
-      let img = imagesRef.current[idx];
+      const drawIfValid = (frameIdx, imgToDraw) => {
+         const currentTarget = Math.max(0, Math.min(frameCount - 1, Math.round(proxy.frame)));
+         const isMovingForward = currentTarget >= currentDrawnIdx;
+         
+         const isImprovement = isMovingForward 
+            ? (frameIdx > currentDrawnIdx && frameIdx <= currentTarget)
+            : (frameIdx < currentDrawnIdx && frameIdx >= currentTarget);
+            
+         if (currentDrawnIdx === -1 || isImprovement || frameIdx === currentTarget) {
+            if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
+               drawImageContain(ctx, imgToDraw, 0, 0, canvas.width, canvas.height);
+               currentDrawnIdx = frameIdx;
+            }
+         }
+      };
+
+      let img = imagesRef.current[targetIdx];
       
       if (img && img.complete) {
-        drawImageContain(ctx, img, 0, 0, canvas.width, canvas.height);
-      } else if (img) {
-        const existingOnload = img.onload;
-        img.onload = (e) => {
-          if (existingOnload) existingOnload(e);
-          if (Math.round(proxy.frame) === idx) {
-            drawImageContain(ctx, img, 0, 0, canvas.width, canvas.height);
-          }
-        };
+        drawIfValid(targetIdx, img);
+      } else {
+        // Fallback: search for the nearest loaded frame to keep the canvas visually active
+        const dir = targetIdx >= currentDrawnIdx ? -1 : 1;
+        let fallbackIdx = targetIdx + dir;
+        
+        while (fallbackIdx !== currentDrawnIdx && fallbackIdx >= 0 && fallbackIdx < frameCount) {
+           let fallbackImg = imagesRef.current[fallbackIdx];
+           if (fallbackImg && fallbackImg.complete && fallbackImg.naturalWidth > 0) {
+              drawIfValid(fallbackIdx, fallbackImg);
+              break;
+           }
+           fallbackIdx += dir;
+        }
+
+        if (img) {
+          const existingOnload = img.onload;
+          img.onload = (e) => {
+            if (existingOnload) existingOnload(e);
+            drawIfValid(targetIdx, img);
+          };
+        }
       }
     };
 
@@ -150,8 +181,6 @@ const HeroSection = () => {
 
     let gsapCtx = gsap.context(() => {
       
-      let revealTween = null;
-      
       // 1. INITIAL REVEAL LOGIC
       gsap.set([canvas, ".hero-text-anim"], { opacity: 0 });
       gsap.set(canvas, { scale: 1.05 });
@@ -166,9 +195,11 @@ const HeroSection = () => {
       gsap.set(".final-title-safe", { x: "-8vw", opacity: 0 });
       gsap.set(".final-title-hands", { x: "8vw", opacity: 0 });
 
+      let textRevealTween;
+
       const playHeroReveal = () => {
         gsap.to(canvas, { scale: 1, opacity: 1, duration: 2, ease: "power3.out" });
-        revealTween = gsap.to(".hero-text-anim", { opacity: 1, y: 0, duration: 1.5, stagger: 0.1, ease: "power2.out" });
+        textRevealTween = gsap.to(".hero-text-anim", { opacity: 1, y: 0, duration: 1.5, stagger: 0.1, ease: "power2.out" });
       };
 
       if (!showIntro) {
@@ -217,11 +248,12 @@ const HeroSection = () => {
           scrub: 1, // Smooth interpolation between frames
           anticipatePin: 1,
           onUpdate: (self) => {
-             // Explicitly kill the initial reveal tween if scrolling starts,
-             // guaranteeing it cannot fight the scroll timeline for opacity/transform control.
-             if (self.progress > 0 && revealTween) {
-                revealTween.kill();
-                revealTween = null;
+             // CRITICAL FIX: If the user scrolls before the intro animation finishes, 
+             // it will conflict with the scrubbed scroll timeline and get stuck.
+             // We kill the intro tween as soon as scroll starts dictating the state.
+             if (textRevealTween && self.progress > 0) {
+                 textRevealTween.kill();
+                 textRevealTween = null;
              }
           }
         }

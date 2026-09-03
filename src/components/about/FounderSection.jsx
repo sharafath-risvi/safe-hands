@@ -14,7 +14,7 @@ const FounderSection = () => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top center", // Start animation when section is in the middle of screen
+          start: "top 85%", // Start animation immediately when entering viewport
           end: "bottom top",
           toggleActions: "play none none reverse"
         }
@@ -33,9 +33,9 @@ const FounderSection = () => {
          ease: "power3.inOut" 
       })
       
-      // PHASE 2: Left & Right Content Reveal
-      .to(".fs-left-content", { opacity: 1, x: 0, duration: 1, ease: "power2.out" }, "-=0.5")
-      .to(".fs-right-content", { opacity: 1, x: 0, duration: 1, ease: "power2.out" }, "-=0.8");
+      // PHASE 2: Left & Right Content Reveal (triggering much earlier)
+      .to(".fs-left-content", { opacity: 1, x: 0, duration: 1, ease: "power2.out" }, "-=1.0")
+      .to(".fs-right-content", { opacity: 1, x: 0, duration: 1, ease: "power2.out" }, "-=1.1");
 
       // Subtle parallax on scroll
       gsap.to(imageRef.current, {

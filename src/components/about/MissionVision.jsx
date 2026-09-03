@@ -13,11 +13,9 @@ const MissionVision = () => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top top",
-          end: "+=1500",
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1
+          start: "top 85%", // Start animation almost immediately when entering viewport
+          end: "bottom top",
+          toggleActions: "play none none reverse"
         }
       });
 
@@ -33,9 +31,9 @@ const MissionVision = () => {
         .to(".mv-mission-block", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, 0.2);
 
       // Phase 2: Vision scrolls up while Mission stays
-      tl.to(".mv-vision-block", { y: 0, opacity: 1, duration: 1.5, ease: "power2.out" }, 1);
+      tl.to(".mv-vision-block", { y: 0, opacity: 1, duration: 1.5, ease: "power2.out" }, 0.6); // Reduced delay from 1.0s to 0.6s
 
-      // Phase 3: Hold
+      // Phase 3: Hold (not strictly necessary without scrub, but kept for timing consistency)
       tl.to({}, { duration: 0.5 });
 
     }, containerRef);
