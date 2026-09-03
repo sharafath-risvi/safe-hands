@@ -150,6 +150,8 @@ const HeroSection = () => {
 
     let gsapCtx = gsap.context(() => {
       
+      let revealTween = null;
+      
       // 1. INITIAL REVEAL LOGIC
       gsap.set([canvas, ".hero-text-anim"], { opacity: 0 });
       gsap.set(canvas, { scale: 1.05 });
@@ -166,7 +168,7 @@ const HeroSection = () => {
 
       const playHeroReveal = () => {
         gsap.to(canvas, { scale: 1, opacity: 1, duration: 2, ease: "power3.out" });
-        gsap.to(".hero-text-anim", { opacity: 1, y: 0, duration: 1.5, stagger: 0.1, ease: "power2.out" });
+        revealTween = gsap.to(".hero-text-anim", { opacity: 1, y: 0, duration: 1.5, stagger: 0.1, ease: "power2.out" });
       };
 
       if (!showIntro) {
@@ -213,7 +215,15 @@ const HeroSection = () => {
           end: () => `+=${scrollDistance}`,
           pin: true,
           scrub: 1, // Smooth interpolation between frames
-          anticipatePin: 1
+          anticipatePin: 1,
+          onUpdate: (self) => {
+             // Explicitly kill the initial reveal tween if scrolling starts,
+             // guaranteeing it cannot fight the scroll timeline for opacity/transform control.
+             if (self.progress > 0 && revealTween) {
+                revealTween.kill();
+                revealTween = null;
+             }
+          }
         }
       });
 
@@ -225,7 +235,8 @@ const HeroSection = () => {
           y: -40,
           duration: frameCount * 0.07,
           ease: "power2.inOut",
-          immediateRender: false
+          immediateRender: false,
+          overwrite: "auto"
         }, 0);
 
       // 2b. Cinematic Split-Direction Typography Exit
@@ -238,7 +249,8 @@ const HeroSection = () => {
           filter: "blur(4px)",
           duration: frameCount * 0.07,
           ease: "power2.inOut",
-          immediateRender: false
+          immediateRender: false,
+          overwrite: "auto"
         }, 0);
 
       tl.fromTo(".hero-line-2", 
@@ -250,7 +262,8 @@ const HeroSection = () => {
           filter: "blur(4px)",
           duration: frameCount * 0.07,
           ease: "power2.inOut",
-          immediateRender: false
+          immediateRender: false,
+          overwrite: "auto"
         }, 0);
 
       // STATE 1: VIDEO PLAYING (takes 'frameCount' arbitrary units of timeline duration)
