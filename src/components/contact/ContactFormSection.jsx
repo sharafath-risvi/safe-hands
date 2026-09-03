@@ -26,7 +26,7 @@ const ContactFormSection = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 lg:py-32 bg-[#f9f9f9] text-black overflow-hidden px-6 lg:px-12">
+    <section id="contact-form" ref={sectionRef} className="py-24 lg:py-32 bg-[#f9f9f9] text-black overflow-hidden px-6 lg:px-12">
       <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row shadow-2xl rounded-2xl overflow-hidden cf-fade-up">
         
         {/* Left Side: Info (Black Block) */}

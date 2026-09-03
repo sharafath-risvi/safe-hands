@@ -423,24 +423,24 @@ const HeroSection = () => {
         
         {/* Top Static Label */}
         <div className="mb-4 sm:mb-6 md:mb-8 md:translate-y-0">
-           <span className="hero-text-anim inline-block text-brand-yellow text-[10px] sm:text-xs tracking-[0.25em] md:tracking-[0.4em] font-semibold uppercase drop-shadow-md">
+           <span className="hero-text-anim inline-block text-brand-yellow text-xs sm:text-sm md:text-xs tracking-[0.25em] md:tracking-[0.4em] font-semibold uppercase drop-shadow-md">
              SAFE HANDS PROPERTY MANAGEMENT
            </span>
         </div>
 
         {/* Main Title - Left Aligned Composition on Desktop, Centered on Mobile */}
         <div className="w-full flex flex-col md:flex-col mb-6 sm:mb-8 md:mb-8 pointer-events-none select-none justify-center md:justify-start items-center md:items-start gap-1 md:gap-0 md:translate-y-0">
-           <h1 className="hero-text-anim hero-line-1 whitespace-nowrap text-[clamp(2rem,9vw,3.5rem)] md:text-[clamp(2.5rem,7vw,110px)] font-bold text-white leading-[1.1] md:leading-[1.0] tracking-tight drop-shadow-2xl text-center md:text-left">
+           <h1 className="hero-text-anim hero-line-1 whitespace-nowrap text-[clamp(2.4rem,11vw,4rem)] md:text-[clamp(2.5rem,7vw,110px)] font-bold text-white leading-[1.1] md:leading-[1.0] tracking-tight drop-shadow-2xl text-center md:text-left">
              PROPERTY CARE
            </h1>
-           <h1 className="hero-text-anim hero-line-2 whitespace-nowrap text-[clamp(2rem,9vw,3.5rem)] md:text-[clamp(2.5rem,7vw,110px)] font-bold text-brand-yellow leading-[1.1] md:leading-[1.0] tracking-tight drop-shadow-2xl text-center md:text-left">
+           <h1 className="hero-text-anim hero-line-2 whitespace-nowrap text-[clamp(2.4rem,11vw,4rem)] md:text-[clamp(2.5rem,7vw,110px)] font-bold text-brand-yellow leading-[1.1] md:leading-[1.0] tracking-tight drop-shadow-2xl text-center md:text-left">
              REDEFINED
            </h1>
         </div>
         
         {/* Subtitle / Philosophy */}
-        <div className="flex justify-center md:justify-start md:translate-y-0">
-          <p className="hero-text-anim text-xs sm:text-sm md:text-xl text-white/80 font-light leading-relaxed max-w-[90%] sm:max-w-md md:max-w-xl border-l-0 md:border-l-2 md:border-brand-yellow pl-0 md:pl-4 text-center md:text-left">
+        <div className="flex justify-center md:justify-start md:translate-y-0 mt-4 md:mt-0">
+          <p className="hero-text-anim text-base sm:text-lg md:text-xl text-white md:text-white/80 font-normal md:font-light leading-relaxed max-w-[95%] sm:max-w-md md:max-w-xl border-l-0 md:border-l-2 md:border-brand-yellow pl-0 md:pl-4 text-center md:text-left [text-shadow:0_2px_12px_rgba(0,0,0,1)] md:[text-shadow:none]">
              A modern standard of stewardship designed for premium assets. We monitor, maintain, and protect your property down to the absolute finest margin.
           </p>
         </div>

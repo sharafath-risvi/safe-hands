@@ -1,4 +1,5 @@
 import React, { useRef, useLayoutEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -36,6 +37,7 @@ const SERVICES = [
 
 const ExpertiseSection = () => {
   const containerRef = useRef(null);
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
@@ -309,7 +311,7 @@ const ExpertiseSection = () => {
                           <p className={`text-lg leading-relaxed font-light ${textClasses.desc}`}>
                             {service.desc}
                           </p>
-                          <div className={`mt-10 flex items-center gap-4 cursor-pointer group ${textClasses.title}`}>
+                          <div onClick={() => navigate('/services')} className={`mt-10 flex items-center gap-4 cursor-pointer group ${textClasses.title} w-max`}>
                              <span className="text-sm font-semibold tracking-widest uppercase">Explore Service</span>
                              <div className="w-8 h-[1px] bg-current group-hover:w-16 transition-all duration-300" />
                           </div>
@@ -353,7 +355,11 @@ const ExpertiseSection = () => {
                    <span className="text-brand-yellow text-4xl font-mono font-bold tracking-tighter block mb-2">{service.id}</span>
                    <h3 className={`text-4xl font-bold mb-4 tracking-tighter leading-[1] ${textClasses.title}`}>{service.nameHTML}</h3>
                    <p className={`text-base font-medium mb-4 uppercase tracking-tight ${textClasses.tagline}`}>{service.tagline}</p>
-                   <p className={`text-sm leading-relaxed mb-8 ${textClasses.desc}`}>{service.desc}</p>
+                   <p className={`text-sm leading-relaxed mb-6 ${textClasses.desc}`}>{service.desc}</p>
+                   <div onClick={() => navigate('/services')} className={`mb-8 flex items-center gap-4 cursor-pointer group ${textClasses.title} w-max`}>
+                      <span className="text-sm font-semibold tracking-widest uppercase">Explore Service</span>
+                      <div className="w-8 h-[1px] bg-current group-hover:w-16 transition-all duration-300" />
+                   </div>
                    <div className="w-full aspect-[4/3] overflow-hidden rounded-sm">
                       <img src={service.img} className="w-full h-full object-cover" alt="Service" />
                    </div>

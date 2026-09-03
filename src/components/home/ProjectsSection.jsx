@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -37,6 +38,7 @@ const PROJECTS = [
 
 const ProjectsSection = () => {
   const masterContainerRef = useRef(null);
+  const navigate = useNavigate();
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
@@ -284,7 +286,7 @@ const ProjectsSection = () => {
                            {project.desc}
                         </p>
                         
-                        <div className="mt-8 flex items-center gap-4 cursor-pointer group w-fit">
+                        <div onClick={() => navigate('/projects')} className="mt-8 flex items-center gap-4 cursor-pointer group w-fit">
                            <span className="text-xs font-bold tracking-widest uppercase text-white">View Details</span>
                            <div className="w-8 h-[1px] bg-brand-yellow group-hover:w-16 transition-all duration-300" />
                         </div>
@@ -325,7 +327,11 @@ const ProjectsSection = () => {
                        <div>
                          <span className="text-brand-yellow text-xs font-mono mb-2 block">{project.id} // {project.location}</span>
                          <h3 className="text-2xl font-bold mb-2">{project.name}</h3>
-                         <p className="text-sm text-brand-light-gray">{project.desc}</p>
+                         <p className="text-sm text-brand-light-gray mb-6">{project.desc}</p>
+                         <div onClick={() => navigate('/projects')} className="flex items-center gap-4 cursor-pointer group w-fit">
+                            <span className="text-xs font-bold tracking-widest uppercase text-white">View Details</span>
+                            <div className="w-8 h-[1px] bg-brand-yellow group-hover:w-16 transition-all duration-300" />
+                         </div>
                        </div>
                     </div>
                  </div>

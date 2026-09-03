@@ -143,13 +143,12 @@ const TimelineSection = () => {
 
                {/* Right Side: Visual Moment */}
                <div className="w-full md:w-[40%] h-[30vh] md:h-[60vh] flex items-center justify-center relative z-20">
-                  <div className="w-full h-full relative overflow-hidden shadow-2xl border border-white/5">
+                  <div className="w-full h-full relative overflow-hidden border border-white/5">
                      <img 
                         src={milestone.img} 
-                        className="tl-img w-full h-full object-cover origin-center grayscale" 
+                        className="tl-img w-full h-full object-cover origin-center" 
                         alt={milestone.title}
                      />
-                     <div className="absolute inset-0 bg-brand-yellow mix-blend-multiply opacity-20" />
                   </div>
                </div>
                

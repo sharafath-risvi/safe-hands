@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight } from "lucide-react";
@@ -6,15 +7,16 @@ import { ArrowRight } from "lucide-react";
 gsap.registerPlugin(ScrollTrigger);
 
 const SERVICES = [
-  { id: "01", name: "PROPERTY MANAGEMENT", desc: "Comprehensive management covering tenant relations, maintenance, and asset optimization.", visual: "pm" },
-  { id: "02", name: "ELECTRICAL SOLUTIONS", desc: "Fault detection, complete wiring, switchboard upgrades, and preventive maintenance.", visual: "electrical" },
-  { id: "03", name: "PLUMBING & SANITARY", desc: "Advanced leak detection, pipe network installation, and sanitation engineering.", visual: "plumbing" },
-  { id: "04", name: "ARCHITECTURAL PLANNING", desc: "Stilt plans, 3D modeling, technical layouts, and municipal approval drawings.", visual: "planning" },
-  { id: "05", name: "PROPERTY DEVELOPMENT", desc: "Full-scale construction and site development from foundational work to handover.", visual: "development" }
+  { id: "01", name: "PROPERTY MANAGEMENT", desc: "Comprehensive management covering tenant relations, maintenance, and asset optimization.", img: "/images/services/pm.jpg", isStock: false },
+  { id: "02", name: "ELECTRICAL SOLUTIONS", desc: "Fault detection, complete wiring, switchboard upgrades, and preventive maintenance.", img: "https://images.unsplash.com/photo-1555664424-778a1e5e1b48?q=80&w=2500&auto=format&fit=crop", isStock: true },
+  { id: "03", name: "PLUMBING & SANITARY", desc: "Advanced leak detection, pipe network installation, and sanitation engineering.", img: "/images/services/plumbing.jpg", isStock: false },
+  { id: "04", name: "ARCHITECTURAL PLANNING", desc: "Stilt plans, 3D modeling, technical layouts, and municipal approval drawings.", img: "/images/services/planning.jpg", isStock: false },
+  { id: "05", name: "PROPERTY DEVELOPMENT", desc: "Full-scale construction and site development from foundational work to handover.", img: "https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?q=80&w=2500&auto=format&fit=crop", isStock: true }
 ];
 
 const ServiceChapters = () => {
   const sectionRef = useRef(null);
+  const navigate = useNavigate();
   
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -64,7 +66,7 @@ const ServiceChapters = () => {
               <p className="text-brand-dark-900/70 text-lg md:text-2xl leading-relaxed mb-12 max-w-lg">
                 {service.desc}
               </p>
-              <button className="flex items-center gap-4 text-sm font-bold uppercase tracking-widest hover:text-brand-yellow transition-colors group w-max">
+              <button onClick={() => navigate('/contact#contact-form')} className="flex items-center gap-4 text-sm font-bold uppercase tracking-widest hover:text-brand-yellow transition-colors group w-max">
                 Request Service
                 <div className="w-10 h-10 rounded-full border border-brand-dark-900/20 flex items-center justify-center group-hover:border-brand-yellow transition-colors">
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -72,14 +74,27 @@ const ServiceChapters = () => {
               </button>
             </div>
 
-            <div className={`w-full md:w-1/2 h-[50vh] md:h-screen relative overflow-hidden service-visual bg-brand-dark-900 flex items-center justify-center ${isReversed ? 'border-r' : 'border-l'} border-white/5`}>
-              {/* Visual Abstraction for each service */}
-              <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#F8BD16 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-              {service.visual === 'pm' && <div className="w-64 h-64 border border-brand-yellow/50 rounded-full flex items-center justify-center"><div className="w-32 h-32 border border-brand-yellow rotate-45" /></div>}
-              {service.visual === 'electrical' && <div className="flex gap-4"><div className="w-2 h-32 bg-brand-yellow" /><div className="w-2 h-64 bg-brand-white/20" /><div className="w-2 h-48 bg-brand-yellow" /></div>}
-              {service.visual === 'plumbing' && <div className="w-48 h-48 border-b-8 border-r-8 border-brand-yellow rounded-br-3xl" />}
-              {service.visual === 'planning' && <div className="w-64 h-64 border border-white/20 grid grid-cols-2 grid-rows-2"><div className="border-r border-b border-white/20 bg-brand-yellow/20" /><div className="border-b border-white/20" /><div className="border-r border-white/20" /><div className="bg-brand-yellow" /></div>}
-              {service.visual === 'development' && <div className="w-64 h-64 border-4 border-brand-yellow relative"><div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10" /><div className="absolute top-0 right-0 w-16 h-16 bg-brand-yellow" /></div>}
+            <div className={`w-full md:w-1/2 h-[50vh] md:h-screen relative overflow-hidden service-visual bg-brand-dark-900 group ${isReversed ? 'border-r' : 'border-l'} border-white/5`}>
+              {/* Premium Image Illustration */}
+              <img 
+                src={service.img} 
+                alt={service.name}
+                className={`w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-[1.5s] ease-out ${service.isStock ? 'grayscale brightness-75 contrast-125' : 'brightness-90 contrast-110'}`}
+              />
+              
+              {/* Cinematic Overlays */}
+              <div className="absolute inset-0 bg-brand-dark-900 mix-blend-multiply opacity-30 pointer-events-none" />
+              {service.isStock && <div className="absolute inset-0 bg-brand-yellow mix-blend-multiply opacity-20 pointer-events-none" />}
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-dark-900 via-transparent to-brand-dark-900/50 pointer-events-none" />
+              
+              {/* Subtle Architectural Grid/Dots Overlay */}
+              <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#F8BD16 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+              
+              {/* Framing HUD Elements */}
+              <div className="absolute top-8 left-8 w-16 h-[1px] bg-brand-yellow/50 pointer-events-none" />
+              <div className="absolute top-8 left-8 w-[1px] h-16 bg-brand-yellow/50 pointer-events-none" />
+              <div className="absolute bottom-8 right-8 w-16 h-[1px] bg-brand-yellow/50 pointer-events-none" />
+              <div className="absolute bottom-8 right-8 w-[1px] h-16 bg-brand-yellow/50 pointer-events-none" />
             </div>
 
           </section>

@@ -18,7 +18,7 @@ const WhatsAppFloatingButton = () => {
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-[54px] right-[80px] md:bottom-[60px] md:right-[96px] z-[99] flex flex-col items-center justify-center gap-[8px] md:gap-[10px]"
+      className="fixed bottom-[54px] right-[24px] md:bottom-[60px] md:right-[96px] z-[99] flex flex-col items-center justify-center gap-[8px] md:gap-[10px]"
     >
       {/* CIRCULAR BACKGROUND */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[72px] h-[130px] md:w-[84px] md:h-[150px] bg-white/5 backdrop-blur-md border border-white/10 rounded-full shadow-2xl -z-10 pointer-events-none"></div>
