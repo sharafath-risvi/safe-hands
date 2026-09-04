@@ -76,8 +76,8 @@ const HeroSection = () => {
     const renderFrame = (index) => {
       const targetIdx = Math.max(0, Math.min(frameCount - 1, Math.round(index)));
       
-      // Lookahead preload (preload next 15 frames from current position)
-      for (let i = targetIdx; i < Math.min(frameCount, targetIdx + 15); i++) {
+      // Lookahead preload (reduced to 2 frames to prioritize immediate scroll needs)
+      for (let i = targetIdx; i < Math.min(frameCount, targetIdx + 2); i++) {
          loadAndDecodeImage(i);
       }
 
@@ -153,12 +153,12 @@ const HeroSection = () => {
     // Initial draw setup and preloading
     resize(); // Sets initial canvas dimensions
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 4; i++) {
       loadAndDecodeImage(i, i === 0 ? resize : null);
     }
 
     // A background sequential loader
-    let seqIndex = 20;
+    let seqIndex = 4;
     const loadNext = () => {
        while (seqIndex < frameCount && imagesRef.current[seqIndex]) {
           seqIndex++;
