@@ -32,38 +32,6 @@ const HeroSection = () => {
     return true;
   });
 
-  // Preload first few frames immediately, then lazy load the rest smartly
-  useLayoutEffect(() => {
-    // Initial preload of first 20 frames for fast startup
-    for (let i = 0; i < 20; i++) {
-      if (!imagesRef.current[i]) {
-        const img = new Image();
-        img.src = frameUrls[i];
-        imagesRef.current[i] = img;
-      }
-    }
-
-    // A background sequential loader
-    let seqIndex = 20;
-    const loadNext = () => {
-       while (seqIndex < frameCount && imagesRef.current[seqIndex]) {
-          seqIndex++;
-       }
-       if (seqIndex >= frameCount) return;
-       
-       const img = new Image();
-       img.src = frameUrls[seqIndex];
-       imagesRef.current[seqIndex] = img;
-       img.onload = img.onerror = () => {
-          seqIndex++;
-          loadNext();
-       };
-    };
-    
-    // Start background loading shortly after initial load
-    setTimeout(loadNext, 500);
-  }, []);
-
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -103,16 +71,14 @@ const HeroSection = () => {
       ctx.drawImage(img, 0, 0, iw, ih, cx, cy, nw, nh);
     }
 
+    const isFrameReady = (img) => img && (img.isFullyDecoded || (!img.decode && img.complete));
+
     const renderFrame = (index) => {
       const targetIdx = Math.max(0, Math.min(frameCount - 1, Math.round(index)));
       
       // Lookahead preload (preload next 15 frames from current position)
       for (let i = targetIdx; i < Math.min(frameCount, targetIdx + 15); i++) {
-         if (!imagesRef.current[i]) {
-            const preImg = new Image();
-            preImg.src = frameUrls[i];
-            imagesRef.current[i] = preImg;
-         }
+         loadAndDecodeImage(i);
       }
 
       const drawIfValid = (frameIdx, imgToDraw) => {
@@ -124,7 +90,7 @@ const HeroSection = () => {
             : (frameIdx < currentDrawnIdx && frameIdx >= currentTarget);
             
          if (currentDrawnIdx === -1 || isImprovement || frameIdx === currentTarget) {
-            if (imgToDraw && imgToDraw.complete && imgToDraw.naturalWidth > 0) {
+            if (isFrameReady(imgToDraw) && imgToDraw.naturalWidth > 0) {
                drawImageContain(ctx, imgToDraw, 0, 0, canvas.width, canvas.height);
                currentDrawnIdx = frameIdx;
             }
@@ -133,7 +99,7 @@ const HeroSection = () => {
 
       let img = imagesRef.current[targetIdx];
       
-      if (img && img.complete) {
+      if (isFrameReady(img)) {
         drawIfValid(targetIdx, img);
       } else {
         // Fallback: search for the nearest loaded frame to keep the canvas visually active
@@ -142,20 +108,36 @@ const HeroSection = () => {
         
         while (fallbackIdx !== currentDrawnIdx && fallbackIdx >= 0 && fallbackIdx < frameCount) {
            let fallbackImg = imagesRef.current[fallbackIdx];
-           if (fallbackImg && fallbackImg.complete && fallbackImg.naturalWidth > 0) {
+           if (isFrameReady(fallbackImg)) {
               drawIfValid(fallbackIdx, fallbackImg);
               break;
            }
            fallbackIdx += dir;
         }
+      }
+    };
 
-        if (img) {
-          const existingOnload = img.onload;
-          img.onload = (e) => {
-            if (existingOnload) existingOnload(e);
-            drawIfValid(targetIdx, img);
-          };
-        }
+    const loadAndDecodeImage = (index, onReady = null) => {
+      if (imagesRef.current[index]) {
+         if (onReady && isFrameReady(imagesRef.current[index])) onReady();
+         return;
+      }
+      
+      const img = new Image();
+      img.isFullyDecoded = false;
+      img.src = frameUrls[index];
+      imagesRef.current[index] = img;
+      
+      const handleReady = () => {
+          img.isFullyDecoded = true;
+          if (onReady) onReady();
+          renderFrame(proxy.frame);
+      };
+
+      if (img.decode) {
+          img.decode().then(handleReady).catch(handleReady);
+      } else {
+          img.onload = img.onerror = handleReady;
       }
     };
 
@@ -168,16 +150,29 @@ const HeroSection = () => {
 
     window.addEventListener("resize", resize);
     
-    // Initial draw once first frame loads
-    if (imagesRef.current[0]) {
-      if (imagesRef.current[0].complete) {
-        resize();
-      } else {
-        imagesRef.current[0].onload = resize;
-      }
-    } else {
-        resize();
+    // Initial draw setup and preloading
+    resize(); // Sets initial canvas dimensions
+
+    for (let i = 0; i < 20; i++) {
+      loadAndDecodeImage(i, i === 0 ? resize : null);
     }
+
+    // A background sequential loader
+    let seqIndex = 20;
+    const loadNext = () => {
+       while (seqIndex < frameCount && imagesRef.current[seqIndex]) {
+          seqIndex++;
+       }
+       if (seqIndex >= frameCount) return;
+       
+       loadAndDecodeImage(seqIndex, () => {
+          seqIndex++;
+          loadNext();
+       });
+    };
+    
+    // Start background loading shortly after initial load
+    setTimeout(loadNext, 500);
 
     let gsapCtx = gsap.context(() => {
       
