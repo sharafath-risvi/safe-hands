@@ -51,15 +51,10 @@ const HeroSection = () => {
       const ih = img.height;
       
       // Calculate fit ratio
-      // Desktop remains exactly object-fit: contain (original behavior)
-      // Mobile becomes object-fit: cover (full screen, immersive)
-      let r = Math.min(w / iw, h / ih); 
+      // Use object-fit: cover behavior for all devices to ensure the video covers the entire 100dvh hero section
+      // This is the strictly necessary zoom to eliminate any letterboxing/black gaps at the bottom
+      let r = Math.max(w / iw, h / ih);
       
-      const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      if (isMobile) {
-        r = Math.max(w / iw, h / ih);
-      }
-
       const nw = iw * r;
       const nh = ih * r;
       
@@ -143,8 +138,13 @@ const HeroSection = () => {
 
     // Ensure canvas sizing is responsive
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      if (canvas && canvas.parentElement) {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+      } else {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
       renderFrame(proxy.frame);
     };
 
@@ -369,7 +369,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section ref={containerRef} className="relative w-full h-screen overflow-hidden bg-[#050505]">
+    <section ref={containerRef} className="relative w-full h-[100dvh] overflow-hidden bg-[#050505]">
       
       {/* CINEMATIC INTRO */}
       {showIntro && (
