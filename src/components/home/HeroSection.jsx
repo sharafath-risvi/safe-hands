@@ -153,7 +153,7 @@ const HeroSection = () => {
           const existingOnload = img.onload;
           img.onload = (e) => {
             if (existingOnload) existingOnload(e);
-            drawIfValid(targetIdx, img);
+            if (isMounted) drawIfValid(targetIdx, img);
           };
         }
       }
@@ -168,18 +168,14 @@ const HeroSection = () => {
 
     window.addEventListener("resize", resize);
     
-    // Initial draw once first frame loads
-    if (imagesRef.current[0]) {
-      if (imagesRef.current[0].complete) {
-        resize();
-      } else {
-        imagesRef.current[0].onload = resize;
-      }
-    } else {
-        resize();
-    }
+    // Define state to track mounted status for safe cleanup
+    let isMounted = true;
+    let gsapCtx = null;
 
-    let gsapCtx = gsap.context(() => {
+    const initScrollAnimation = () => {
+       if (!isMounted || gsapCtx) return;
+       
+       gsapCtx = gsap.context(() => {
       
       // 1. INITIAL REVEAL LOGIC
       gsap.set([canvas, ".hero-text-anim"], { opacity: 0 });
@@ -365,11 +361,37 @@ const HeroSection = () => {
       // Final hold to ensure user can appreciate the screen before section unpins
       tl.to({}, { duration: frameCount * 0.04 }); // Optimized final hold before Our Story
 
-    }, containerRef);
+       }, containerRef);
+    };
+
+    // Safely initialize the scroll controller ONLY after the first frame (metadata) is ready.
+    // This prevents the video from getting stuck on the first production load.
+    if (imagesRef.current[0]) {
+      if (imagesRef.current[0].complete) {
+        resize();
+        initScrollAnimation();
+      } else {
+        const existingOnload = imagesRef.current[0].onload;
+        const existingOnerror = imagesRef.current[0].onerror;
+        
+        const handleReady = (e, originalCallback) => {
+           if (originalCallback) originalCallback(e);
+           resize();
+           initScrollAnimation();
+        };
+
+        imagesRef.current[0].onload = (e) => handleReady(e, existingOnload);
+        imagesRef.current[0].onerror = (e) => handleReady(e, existingOnerror);
+      }
+    } else {
+        resize();
+        initScrollAnimation();
+    }
     
     return () => {
+      isMounted = false;
       window.removeEventListener("resize", resize);
-      gsapCtx.revert();
+      if (gsapCtx) gsapCtx.revert();
     };
   }, []);
 
