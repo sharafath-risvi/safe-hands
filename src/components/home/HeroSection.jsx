@@ -5,9 +5,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const frameUrls = [
-  ...Array.from({ length: 250 }, (_, i) => `/videos/heroframes1/ezgif-frame-${String(i + 1).padStart(3, '0')}.png`),
-  ...Array.from({ length: 150 }, (_, i) => `/videos/heroframes2/ezgif-frame-${String(i + 1).padStart(3, '0')}.png`),
-  ...Array.from({ length: 150 }, (_, i) => `/videos/heroframes3/ezgif-frame-${String(i + 1).padStart(3, '0')}.png`)
+  ...Array.from({ length: 250 }, (_, i) => `/videos/heroframes1-webp/ezgif-frame-${String(i + 1).padStart(3, '0')}.webp`),
+  ...Array.from({ length: 150 }, (_, i) => `/videos/heroframes2-webp/ezgif-frame-${String(i + 1).padStart(3, '0')}.webp`),
+  ...Array.from({ length: 150 }, (_, i) => `/videos/heroframes3-webp/ezgif-frame-${String(i + 1).padStart(3, '0')}.webp`)
 ];
 const frameCount = frameUrls.length;
 
