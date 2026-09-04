@@ -49,12 +49,24 @@ const HeroSection = () => {
 
       const iw = img.width;
       const ih = img.height;
+      let r;
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
       
-      // Calculate fit ratio
-      // Use object-fit: cover behavior for all devices to ensure the video covers the entire 100dvh hero section
-      // This is the strictly necessary zoom to eliminate any letterboxing/black gaps at the bottom
-      let r = Math.max(w / iw, h / ih);
-      
+      if (isMobile) {
+        // Mobile retains standard object-fit: cover behavior
+        r = Math.max(w / iw, h / ih);
+      } else {
+        // Desktop uses the 14-inch Mac (1512x982) as the reference composition.
+        // This ensures consistent cropping and scale across different laptop aspect ratios 
+        // (e.g. 16:9, 16:10) without black bars or random zoom out effects.
+        const refW = 1512;
+        const refH = 982;
+        const refScale = Math.max(refW / iw, refH / ih);
+        const currentScaleX = w / refW;
+        const currentScaleY = h / refH;
+        
+        r = refScale * Math.max(currentScaleX, currentScaleY);
+      }
       const nw = iw * r;
       const nh = ih * r;
       
